@@ -1,0 +1,6 @@
+com/oracle/examples/events/orders/model/Order.class
+com/oracle/examples/events/orders/Main.class
+com/oracle/examples/events/orders/OrderResource.class
+com/oracle/examples/events/orders/OrderApplication.class
+com/oracle/examples/events/orders/OrderProvider.class
+com/oracle/examples/events/orders/OrderRepository.class

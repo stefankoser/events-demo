@@ -1,52 +1,11 @@
 # Order Service
 
+Based on user-svc-helidon 
+
 ## Framework
 
-This service utilizes Helidon MP with Hibernate to persist users to a `order` table in an Oracle ATP instance.
+This service utilizes Helidon MP with Hibernate to persist orders in an H2 DB
 
-
-
-The DDL to create the database table looks like so:
-
-Create the schema/user:
-
-```sql
-CREATE USER usersvc IDENTIFIED BY "STRONGPASSWORD";
-GRANT create session TO usersvc;
-GRANT create table TO usersvc;
-GRANT create view TO usersvc;
-GRANT create any trigger TO usersvc;
-GRANT create any procedure TO usersvc;
-GRANT create sequence TO usersvc;
-GRANT create synonym TO usersvc;
-GRANT CONNECT TO usersvc;
-GRANT RESOURCE TO usersvc;
-GRANT UNLIMITED TABLESPACE TO usersvc;
-```
-
-Create the necessary table(s):
-
-```sql
-CREATE TABLE JPA_USERS(
-    "ID" VARCHAR2(32 BYTE) DEFAULT ON NULL SYS_GUID(), 
-	"FIRST_NAME" VARCHAR2(50 BYTE) COLLATE "USING_NLS_COMP" NOT NULL ENABLE, 
-	"LAST_NAME" VARCHAR2(50 BYTE) COLLATE "USING_NLS_COMP" NOT NULL ENABLE, 
-	"USERNAME" VARCHAR2(50 BYTE) COLLATE "USING_NLS_COMP" NOT NULL ENABLE, 
-	"CREATED_ON" TIMESTAMP (6) DEFAULT ON NULL CURRENT_TIMESTAMP, 
-	 CONSTRAINT "JPA_USER_PK" PRIMARY KEY ("ID")
-);
-```
-
-## Dependencies
-
-~~This project requires the following JARs from Oracle.~~
-
-~~* ojdbc8.jar~~
-~~* oraclepki.jar~~
-~~* osdt_cert.jar~~
-~~* osdt_core.jar~~
-
-Update: April 2020. This is no longer required. OJDBC dependencies are in Maven Central and the `POM.xml` has been updated to pull from there.
 
 ## Building
 
@@ -56,131 +15,35 @@ mvn package
 
 ## Running
 
-Create a debug configuration in IntelliJ that runs `mvn package` and then runs the generated JAR. Pass the following properties as 'VM Options':
-
-```bash
--Ddatasource.username=[Username]
--Ddatasource.password=[Strong Password]
--Ddatasource.url=jdbc:oracle:thin:@demodb_LOW?TNS_ADMIN=/path/to/wallet
-```
-
-**Note:** If you're not using IntelliJ, just make sure that you pass all properties:
- 
  ```bash
-java 
-    -Ddatasource.username=[username] \
-    -Ddatasource.password=[password] \
-    -Ddatasource.url=jdbc:oracle:thin:@demodb_LOW?TNS_ADMIN=/path/to/wallet \
--jar target/user-svc.jar
+java -jar target/order-svc.jar
 ```
 
 ## Test Endpoints
 
-Get User Service Endpoint (returns 200 OK):
+Get Order Service Endpoint (returns 200 OK):
 
 ```
-curl -iX GET http://localhost:8080/user                                                                                                                                                    
-HTTP/1.1 200 OK
-Content-Type: application/json
-Date: Thu, 20 Jun 2019 10:35:06 -0400
-transfer-encoding: chunked
-connection: keep-alive
-{"OK":true}                                                          
-```
+curl -iX GET http://localhost:8080/oder                                                                                                                                                    
 
-Save a new user (ID is returned in `Location` header):
+Save a new order  (ID is returned in `Location` header):
 
-```bash
+
+
 curl -iX POST -H "Content-Type: application/json" -d '{"firstName": "Todd", "lastName": "Sharp", "username": "recursivecodes"}' http://localhost:8080/user/save                            
-HTTP/1.1 201 Created
-Date: Thu, 20 Jun 2019 10:45:38 -0400
-Location: http://[0:0:0:0:0:0:0:1]:8080/user/8BC3669097C9EC53E0532110000A6E11
-transfer-encoding: chunked
-connection: keep-alive
-```
 
-Save a new user with invalid data (will return 422 and validation errors):
 
-```bash
-curl -iX POST -H "Content-Type: application/json" -d '{"firstName": "A Really Long First Name That Will Be Longer Than 50 Chars", "lastName": null, "username": null}' http://localhost:8080/user/save                            
-HTTP/1.1 422 Unprocessable Entity
-Content-Type: application/json
-Date: Mon, 1 Jul 2019 11:21:57 -0400
-transfer-encoding: chunked
-connection: keep-alive
 
-{"validationErrors":[{"field":"username","message":"may not be null","currentValue":null},{"field":"lastName","message":"may not be null","currentValue":null},{"field":"firstName","message":"size must be between 0 and 50","currentValue":"A Really Long First Name That Will Be Longer Than 50 Chars"}]}%                                    
-```
 
-Get the new user
-
-```bash
-curl -iX GET http://localhost:8080/user/8BC3669097C9EC53E0532110000A6E11                                                                                                                   
-HTTP/1.1 200 OK
-Content-Type: application/json
-Date: Thu, 20 Jun 2019 10:46:17 -0400
-transfer-encoding: chunked
-connection: keep-alive
-
-{"id":"8BC3669097C9EC53E0532110000A6E11","firstName":"Todd","lastName":"Sharp","username":"recursivecodes","createdOn":"2019-06-20T14:45:38.509Z"}
-```
-
-List all users:
-
-```bash
-curl -iX GET http://localhost:8080/user/list                                                                                                                                               
-HTTP/1.1 200 OK
-Content-Type: application/json
-Date: Thu, 20 Jun 2019 10:46:51 -0400
-transfer-encoding: chunked
-connection: keep-alive
-
-[{"id":"8BC3669097C9EC53E0532110000A6E11","firstName":"Todd","lastName":"Sharp","username":"recursivecodes","createdOn":"2019-06-20T14:45:38.509Z"}]
-```
-
-Delete a user:
-
-```bash
-curl -iX DELETE http://localhost:8080/user/8BC3669097C9EC53E0532110000A6E11                                                                                                                
-HTTP/1.1 204 No Content
-Date: Thu, 20 Jun 2019 10:47:21 -0400
-connection: keep-alive
-```
-
-Confirm delete (same GET by ID will return 404):
-
-```bash
-curl -iX GET http://localhost:8080/user/8BC3669097C9EC53E0532110000A6E11                                                                                                                   
-HTTP/1.1 404 Not Found
-Date: Thu, 20 Jun 2019 10:47:43 -0400
-transfer-encoding: chunked
-connection: keep-alive
-```
 
 ## View Health and Metrics
 
 ```bash
 curl -s -X GET http://localhost:8080/health                                                                                                                                                
-{"outcome":"UP","checks":[{"name":"deadlock","state":"UP"},{"name":"diskSpace","state":"UP","data":{"free":"254.50 GB","freeBytes":273264726016,"percentFree":"54.73%","total":"465.02 GB","totalBytes":499313172480}},{"name":"heapMemory","state":"UP","data":{"free":"254.45 MB","freeBytes":266813240,"max":"4.00 GB","maxBytes":4294967296,"percentFree":"98.69%","total":"308.00 MB","totalBytes":322961408}}]}
-```
 
-Prometheus Format
 
-```bash
-curl -s -X GET http://localhost:8080/metrics                                                                                                                                               
-# TYPE base:classloader_current_loaded_class_count counter
-# HELP base:classloader_current_loaded_class_count Displays the number of classes that are currently loaded in the Java virtual machine.
-base:classloader_current_loaded_class_count 13218
-# TYPE base:classloader_total_loaded_class_count counter
-[Truncated]
-```
+                                                                                                                                      
 
-Prometheus JSON Format
-
-```bash
-curl -H 'Accept: application/json' -X GET http://localhost:8080/metrics                                                                                                                    
-{"base":{"classloader.currentLoadedClass.count":13229,"classloader.totalLoadedClass.count":13229,"classloader.totalUnloadedClass.count":0,"cpu.availableProcessors":4,"cpu.systemLoadAverage":3.65185546875,"gc.G1 Old Generation.count":0,"gc.G1 Old Generation.time":0,"gc.G1 Young Generation.count":9,"gc.G1 Young Generation.time":118,"jvm.uptime":556886,"memory.committedHeap":322961408,"memory.maxHeap":4294967296,"memory.usedHeap":58893312,"thread.count":59,"thread.daemon.count":45,"thread.max.count":59},"vendor":{"grpc.requests.count":0,"grpc.requests.meter":{"count":0,"meanRate":0.0,"oneMinRate":0.0,"fiveMinRate":0.0,"fifteenMinRate":0.0},"requests.count":8,"requests.meter":{"count":8,"meanRate":0.014449382373834188,"oneMinRate":0.022447789926396358,"fiveMinRate":0.009851690967428134,"fifteenMinRate":0.005533794777883567}}}
-```
 
 ## Dockerfile
 
@@ -189,13 +52,13 @@ The generated `Dockerfile` requires some changes. See the `Dockerfile` for refer
 ## Building the Docker Image
 
 ```
-docker build -t user-svc .
+docker build -t order-svc .
 ```
 
 ## Running with Docker
 
 ```
-docker run --rm --env DB_URL=jdbc:oracle:thin:@demodb_LOW\?TNS_ADMIN=/helidon/wallet  --env DB_PASSWORD=[Strong Password] --env DB_USER=[USER] -p 8080:8080 user-svc:latest
+docker run --rm -p 8080:8080 order-svc:latest
 ```
 
 Test the endpoints as [described above](#test-endpoints)
