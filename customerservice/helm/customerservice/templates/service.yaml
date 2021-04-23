@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.microservice.name }}
+  labels:
+    app: {{ .Values.microservice.name }}
+    k8s-app: {{ .Values.microservice.name }}
+    prd_name: {{ .Values.service.name }}
+    prd_app: {{ .Values.microservice.name }}
+    prd_svc: {{ .Values.service.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Values.microservice.name }}
+  ports:
+  - port: {{ .Values.microservice.port }}
+    name: http
+  type: ClusterIP
+  

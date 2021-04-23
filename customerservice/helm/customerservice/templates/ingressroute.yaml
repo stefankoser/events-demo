@@ -1,0 +1,25 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.service.name }}-{{ .Values.microservice.name }}-ingressroute
+  namespace: {{ .Release.Namespace }}
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: HeadersRegexp(`oci-original-url`, `.*{{ .Release.Namespace }}.*`) && PathPrefix(`/api/{{ .Values.service.name }}/{{ .Values.microservice.name }}`)
+      kind: Rule
+      services:
+      - name: {{ .Values.microservice.name }}
+        port: 8080
+      middlewares:
+        - name: spectra-stripprefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: spectra-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /api/{{ .Values.service.name }}/{{ .Values.microservice.name }}

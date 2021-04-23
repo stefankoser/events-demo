@@ -1,13 +1,13 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: orderservice
+  name: customerservice
   labels:
-    app: orderservice
+    app: customerservice
 spec:
   type: LoadBalancer
   selector:
-    app: orderservice
+    app: customerservice
   ports:
   - port: 8080
     targetPort: 8080
@@ -16,24 +16,24 @@ spec:
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: orderservice
+  name: customerservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: orderservice
+      app: customerservice
   template:
     metadata:
       labels:
-        app: orderservice
+        app: customerservice
         version: v1
     spec:
       containers:
-      - name: orderservice
-        image: fra.ocir.io/ateamsaas/stefan-ocir-public/orderservice:latest
+      - name: customerservice
+        image: fra.ocir.io/ateamsaas/stefan-ocir-public/customerservice:latest
         command: ["java", "-jar"]
         args:
-        - "order-svc.jar"
+        - "customer-svc.jar"
         imagePullPolicy: Always
         ports:
           - containerPort: 8080

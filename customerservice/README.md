@@ -64,7 +64,7 @@ docker run --rm -p 8080:8080 order-svc:latest
 Test the endpoints as [described above](#test-endpoints)
 
 Deploy image to OCIR:
-
+  # https://blogs.oracle.com/developers/building-and-deploying-a-helidon-microservice-with-hibernate-part-3
 
 
 docker build -t fra.ocir.io/ateamsaas/stefan-ocir-public/orderservice:latest .

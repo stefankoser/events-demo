@@ -1,0 +1,25 @@
+app:
+  greeting: "OrderService"
+server:
+  port: 8080
+
+tracing:
+  service: "orderservice"
+  protocol: "udp"     # JAEGER_ENDPOINT (if not udp, http is expected and endpoint is filled)
+  host: "cluster-platform-jaegeragent-agent.spectra-system"   # JAEGER_ENDPOINT
+  port: 6831  
+  paths:
+    - path: "/hello" 
+      enabled: "true"
+    - path: "/metrics"
+      enabled: "false"
+    - path: "/health"
+      enabled: "false"
+  propagation: "jaeger" # JAEGER_PROPAGATION either "jaeger" or "b3"
+  log-spans: false      # JAEGER_REPORTER_LOG_SPANS
+  sampler-type: "remote"
+  sampler-manager: "cluster-platform-jaegeragent-agent.spectra-system:5778" 
+  tags: 
+    service-version: 1.0
+
+
